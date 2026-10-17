@@ -25,9 +25,8 @@ Given a query that matches at least one listing, the agent completes all three
 tool calls and returns a fit card — in at least 4 of 5 tries.
 
 **Why this target:**
-<!-- Why 4 of 5 and not 5 of 5? Something about your search, probably —
-     "my search is a plain keyword match and some phrasings will miss" is a
-     real answer. -->
+
+I targeted 4 of 5 rather than 5 of 5 because `search_listings` relies on keyword overlap and regex extraction; certain user queries with uncommon slang, synonyms, or descriptive phrasings not mirrored in the mock dataset's `style_tags` or `description` fields may occasionally fail to match a listing.
 
 ---
 
@@ -37,8 +36,8 @@ Given a query that matches no listings, the agent stops before calling
 `suggest_outfit` and returns a message naming what to change — 5 of 5 tries.
 
 **Why this target:**
-<!-- Why is 5 of 5 reasonable here when criterion 1 isn't? What's different
-     about this path? -->
+
+A 5 of 5 target is appropriate because this path relies entirely on deterministic Python control flow (`if not session["search_results"]:`). Once search returns an empty list, the planning loop always branches immediately to set the error message and halts before invoking `suggest_outfit`, free from model non-determinism or network variance.
 
 ---
 
