@@ -59,24 +59,69 @@
 
 ### `search_listings`
 
-- **What it does:**
-- **Inputs:** <!-- name and type each: `max_price` (float), not "a price" -->
-- **Returns:**
-- **When it has nothing:**
+**What it does:**
+
+Takes in a user's general description and finds similar items within the dataset.
+
+**Inputs:** 
+
+Takes in three parameters. The first is 'description' which is a string and is 
+required. This description can include a brand but is not needed. The second parameter 
+is 'size' which is also a string and is a optional parameter. It is not case sensitive 
+and can be passed as 'None' to skip. The third parameter is 'max_price' which is a
+float and is also an optional parameter. It can be passed by passing 'None'.
+  
+**Returns:**
+
+Returns a list of dictionaries. each dict has the following fields:
+id, title, description, category, style_tags (list), size, condition, 
+price (float), colors (list), brand (str or None), platform. 
+
+**When it has nothing:**
+
+If nothing matches a empty list will will be returned.
 
 ### `suggest_outfit`
 
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
+**What it does:**
+
+Suggests outfits based on a user's wardrobe and a new potiential clothing item.
+
+**Inputs:**
+
+Takes in two parameters. The first is a listing dictionary which contains
+the item the user is considering to buy. The second parameter is a 
+dictionary with the key 'items'. These items are clothing items a user
+owns. This dictionary may be empty.
+
+**Returns:**
+
+Returns a string of a potiential outfit based on the information it was given. 
+
+**When it has nothing:**
+
+If the dictionary that contains a user's clothing items is empty it will give
+general styling advice.
 
 ### `create_fit_card`
 
-- **What it does:**
-- **Inputs:**
-- **Returns:**
-- **When it has nothing:**
+**What it does:**
+
+Creates a caption based on the chosen outfit.
+
+**Inputs:**
+
+Takes in two required parameters. The first is 'outfit' which is a string from 
+suggest_outfit(). The second parameter is 'new_item' which is the listing dict 
+for the item.
+
+**Returns:**
+
+A string containing 2 - 4 sentences representing a caption.
+
+**When it has nothing:**
+
+Returns a descriptive message.
 
 ---
 
@@ -94,6 +139,12 @@
      function have to be real. -->
 
 **Branch rule:**
+
+If the string 'description is emtpy in search listing then stop session and ask 
+user for a proper explanation of the item that want. 
+If the dictionary containing a user's clothing items is empty put a message in
+the session asking for more information on their clothing items. Once items have
+been given run suggest_outfits() and pass result onto create_fit_card.
 
 **Where it lives:** `agent.py::run_agent`
 
