@@ -42,60 +42,41 @@ Given a query that matches no listings, the agent stops before calling
 
 ---
 
-## 3. Something about state
+## 3. The selected item in session state matches what suggest_outfit receives
 
-<!-- YOU WRITE THIS ONE.
-
-     How would you know that the item your search found is the same item the
-     next tool received? Name something countable or observable.
-
-     This is the criterion people find hardest, because state failure doesn't
-     look like state failure — it looks like a tool problem. Something that
-     compares session["selected_item"] against what actually reached
-     suggest_outfit is the shape you're after. -->
-
-
+Given a query that returns at least one listing, the item stored in `session["selected_item"]` matches the top listing in `session["search_results"]` by `id` and title, and that exact item dictionary is passed into `suggest_outfit` as `new_item` — in 5 of 5 tries.
 
 **Why this target:**
 
-
+State management in the planning loop is deterministic Python code (`session["selected_item"] = session["search_results"][0]`), with no model variability or network instability. Any mismatch or mutation between what search found and what the next tool received indicates a structural bug in session handling, so it must succeed 5 of 5 tries.
 
 ---
 
-## 4. Something about the fit card
+## 4. A captions must include some descriptive factor on the clothing item
 
-<!-- YOU WRITE THIS ONE.
-
-     The fit card calls a model, so the same input can produce different words
-     each time. That's not a bug — it's the nature of the tool. So what would
-     make it acceptable?
-
-     Think about what you'd actually be unhappy to see. A caption that never
-     mentions the price? Two different items producing the same opening
-     sentence? A card longer than a caption anyone would post? Any of those can
-     be turned into a number. -->
-
-
+Given a clothing item an agent must include some information on one of the 
+possible traits: color, texture, patterns, materials or a unique feature.
+This must happen 5 out of 5 tries.
 
 **Why this target:**
 
-
+If the caption does include any descriptive information about the clothing
+item then it is just a picture. There are no thoughts that go into. No
+emotion and this would cause a reader to not be interested. So to create 
+a caption the thresehold must be a perfect.
 
 ---
 
-## 5. Your choice
+## 5. A caption must include a hook
 
-<!-- YOU WRITE THIS ONE TOO.
-
-     Pick something you actually care about getting right. Speed, the empty
-     wardrobe path, what happens when the model can't be reached, whether the
-     search respects a price ceiling — anything, as long as it names a number
-     or an observable outcome. -->
-
-
+Given a clothing item an agent must make a unique hook to grab a reader's
+attention 4 out of 5 times.
 
 **Why this target:**
 
+This target is reasonable as it is not always possible to create a hook
+for every clothing item. There may also be a scenario where a hook is 
+possible but it would make the caption sound weird.c
 
 
 ---
