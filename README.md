@@ -47,16 +47,6 @@
 
 ## Tool Inventory
 
-<!-- Four lines per tool. This is worth 2 points and it's the single most
-     common place students lose them.
-
-     "Returns a list" earns NOTHING. The description has to say what is IN
-     the list.
-
-     The empty case isn't optional either — it's the thing your loop branches
-     on, and if you don't decide it here you'll discover it as a crash in
-     Milestone 5. -->
-
 ### `search_listings`
 
 **What it does:**
@@ -127,17 +117,6 @@ Returns a descriptive message.
 
 ## Planning Loop
 
-<!-- Your branch rule, stated as a rule — the condition AND both paths — plus
-     the file and function that holds it.
-
-     Like this:
-       "If search_listings returns an empty list, put a message in the session
-        and stop. Otherwise take the first result and go to suggest_outfit."
-        — agent.py::run_agent
-
-     The grader checks your code against what you claim here, so the file and
-     function have to be real. -->
-
 **Branch rule:**
 
 If the string 'description is emtpy in search listing then stop session and ask 
@@ -173,17 +152,60 @@ $ python app.py ask '...'
 ```
 $ python -c "from tools import search_listings; print(search_listings('graphic tee', max_price=30))"
 
-```
 
 ```
-$ python -c "from tools import suggest_outfit; ..."
+[{'id': 'lst_006', 'title': 'Graphic Tee — 2003 Tour Bootleg Style', 'description': 'Vintage-style bootleg tee with faded graphic. Slightly boxy fit. 100% cotton, soft and worn-in.', 'category': 'tops', 'style_tags': ['graphic tee', 'vintage', 'grunge', 'streetwear', 'band tee'], 'size': 'L', 'condition': 'good', 'price': 24.0, 'colors': ['black'], 'brand': None, 'platform': 'depop'}, {'id': 'lst_002', 'title': 'Y2K Baby Tee — Butterfly Print', 'description': 'Super cute early 2000s baby tee with butterfly graphic. Fitted crop length. Tag says medium but fits like a small.', 'category': 'tops', 'style_tags': ['y2k', 'vintage', 'graphic tee', 'cottagecore'], 'size': 'S/M', 'condition': 'excellent', 'price': 18.0, 'colors': ['white', 'pink', 'purple'], 'brand': None, 'platform': 'depop'}, {'id': 'lst_033', 'title': 'Vintage Band Tee — Faded Grey', 'description': 'Faded grey band-style tee with distressed graphic. Crew neck. Fits boxy. Well-loved but no holes or major damage.', 'category': 'tops', 'style_tags': ['vintage', 'grunge', 'band tee', 'graphic tee', 'streetwear'], 'size': 'L', 'condition': 'fair', 'price': 19.0, 'colors': ['grey', 'charcoal'], 'brand': None, 'platform': 'depop'}, {'id': 'lst_017', 'title': 'Mesh Long-Sleeve Top — Black', 'description': 'Sheer black mesh long-sleeve. Great for layering under a graphic tee or over a bralette. Stretchy material, fits true to size.', 'category': 'tops', 'style_tags': ['y2k', 'grunge', 'goth', 'layering'], 'size': 'S/M', 'condition': 'excellent', 'price': 15.0, 'colors': ['black'], 'brand': None, 'platform': 'depop'}, {'id': 'lst_015', 'title': 'Vintage Graphic Hoodie — Faded Black', 'description': 'Faded black pullover hoodie with barely-visible vintage graphic on the chest. Cozy interior. Some pilling but adds to the worn-in look.', 'category': 'tops', 'style_tags': ['vintage', 'grunge', 'graphic', 'streetwear'], 'size': 'L', 'condition': 'fair', 'price': 26.0, 'colors': ['black', 'charcoal'], 'brand': None, 'platform': 'depop'}, {'id': 'lst_012', 'title': 'Oversized Crewneck Sweatshirt — Vintage Navy', 'description': 'Perfectly faded navy crewneck. Genuinely vintage — not manufactured distressed. Ribbed cuffs and hem. No graphics, clean.', 'category': 'tops', 'style_tags': ['vintage', 'basics', 'oversized', 'classic'], 'size': 'XL (fits oversized)', 'condition': 'good', 'price': 20.0, 'colors': ['navy'], 'brand': None, 'platform': 'thredUp'}, {'id': 'lst_011', 'title': 'Low-Rise Cargo Pants — Khaki', 'description': 'Y2K era low-rise cargo pants. Lots of pockets. Khaki color, slightly distressed at the hems. Great for layering with a long tee.', 'category': 'bottoms', 'style_tags': ['y2k', 'cargo', '2000s', 'streetwear'], 'size': 'W29', 'condition': 'fair', 'price': 27.0, 'colors': ['khaki', 'tan'], 'brand': None, 'platform': 'poshmark'}]
+```
+
+
+$ python -c "from tools import suggest_outfit; from utils.data_loader import get_example_wardrobe, load_listings; print(suggest_outfit(load_listings()[0], get_example_wardrobe()))"
+
+
+```
+Hey there! I’m so excited you’re eyeing these Vintage Levi's 501 Jeans. At $38, they are an absolute steal and a wardrobe holy grail—nothing beats that broken-in, authentic medium wash with lived-in knee fading. 
+
+Since you already have an amazing base of versatile basics, we can style these effortlessly. Here are two complete, stylish outfits incorporating your new thrifted 501s with pieces straight from your closet!
+
+---
+
+### Outfit 1: The Off-Duty Model Streetwear Look
+*This look leans into the vintage streetwear vibe of the 501s, playing with proportions and classic textures for an effortless, cool-girl aesthetic.*
+
+* **The New Piece:** Vintage Levi's 501 Jeans ($38)
+* **Top:** **White ribbed tank top**
+* **Outerwear:** **Vintage black denim jacket**
+* **Shoes:** **Chunky white sneakers**
+* **Accessories:** **Brown leather belt** & **Black crossbody bag**
+
+**Why this works:** 
+The combination of a crisp **white ribbed tank top** tucked into medium-wash denim is timeless. Adding your **brown leather belt** breaks up the look and adds a rich, vintage contrast against the indigo wash. Throwing your **vintage black denim jacket** on top creates a cool "denim-on-denim" (or Canadian tuxedo) moment without feeling matchy-matchy, since the blacks and blues complement each other so well. Grounding the outfit with **chunky white sneakers** keeps it fresh, sporty, and ultra-comfortable for a day out, while the **black crossbody bag** ties the dark accessories together.
+
+---
+
+### Outfit 2: The Edgy 90s Casual Look
+*This fit leans a bit more grunge and edgy, perfect for cooler weather, coffee runs, or casual hangouts.*
+
+* **The New Piece:** Vintage Levi's 501 Jeans ($38)
+* **Top:** **Black cropped zip hoodie**
+* **Shoes:** **Black combat boots**
+* **Accessories:** **Brown leather belt** & **Black crossbody bag**
+
+**Why this works:**
+Levi's 501s have a classic straight-leg structure that pairs *dreamily* with chunkier footwear. Tucking a bit of the **black cropped zip hoodie** into the jeans—accentuated by your **brown leather belt**—creates a flattering waistline that balances out the relaxed fit of the denim and the jacket. Pairing the jeans with your **black combat boots** gives the outfit a subtle edge and allows the straight-leg hem to break over the boots just right. Finish it off with the **black crossbody bag** for a sleek, cohesive, grab-and-go city look.
+
+---
+
+### Stylist Verdict:
+**Buy them!** For $38, these Levi's 501s bridge the gap between all your casual tops and outerwear. They’ll easily become the most worn pair of jeans in your rotation. Which vibe are you rocking first?
+```
+
+
+$ python -c "from tools import create_fit_card; from utils.data_loader import load_listings; print(create_fit_card('jeans and white sneakers', load_listings()[0]))"
 
 ```
 
-```
-$ python -c "from tools import create_fit_card; ..."
+Stop scrolling because the holy grail of denim has officially entered the chat. These vintage Levi's 501 jeans feature a dreamy medium indigo wash with naturally faded knees that scream effortless cool. Pair them with your freshest white sneakers for an instant off-duty model fit. Grab them now over on depop for just $38.00 before someone else beats you to it!
 
-```
 
 ---
 
@@ -227,12 +249,12 @@ $ python -c "from tools import create_fit_card; ..."
      into results/. Paste it here and fill in the verdicts. -->
 
 | Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
-|---|---|---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |  |  |
+| --------- | ------ | ----- | ----- | ----- | ----- | ----- | ------- |
+| 1.        |        |       |       |       |       |       |         |
+| 2.        |        |       |       |       |       |       |         |
+| 3.        |        |       |       |       |       |       |         |
+| 4.        |        |       |       |       |       |       |         |
+| 5.        |        |       |       |       |       |       |         |
 
 **Real output from one try**, pasted as text, naming the file and function
 that produced it:
@@ -261,13 +283,13 @@ that produced it:
      Look for a pattern. Three misses on the same tool is one problem, not
      three. -->
 
-| # | Criterion | Target | Verdict | How I decided |
-|---|---|---|---|---|
-| 1 |  |  |  |  |
-| 2 |  |  |  |  |
-| 3 |  |  |  |  |
-| 4 |  |  |  |  |
-| 5 |  |  |  |  |
+| #   | Criterion | Target | Verdict | How I decided |
+| --- | --------- | ------ | ------- | ------------- |
+| 1   |           |        |         |               |
+| 2   |           |        |         |               |
+| 3   |           |        |         |               |
+| 4   |           |        |         |               |
+| 5   |           |        |         |               |
 
 **Diagnoses**
 
@@ -322,12 +344,12 @@ full. -->
 ### Run Log — After
 
 | Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
-|---|---|---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |  |  |
+| --------- | ------ | ----- | ----- | ----- | ----- | ----- | ------- |
+| 1.        |        |       |       |       |       |       |         |
+| 2.        |        |       |       |       |       |       |         |
+| 3.        |        |       |       |       |       |       |         |
+| 4.        |        |       |       |       |       |       |         |
+| 5.        |        |       |       |       |       |       |         |
 
 **Did it help, and how do I know:**
 
