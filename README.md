@@ -330,32 +330,38 @@ that produced it:
 
 ## Loop Trace
 
-<!-- One full run, printed step by step, with the MCP call visible in it.
-
-     `python app.py ask '...' --trace` once you've added the trace.step()
-     calls in Milestone 2.
-
-     Worth pasting BOTH the happy path and the empty-search path. The empty
-     one should be visibly shorter, because it stops. If your two traces are
-     the same length, your branch isn't working — and this is the fastest way
-     anyone will ever find that out. -->
 
 **Happy path**
 
 ```
-
+$ python app.py ask 'vintage graphic tee under $30' --trace
+[1] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: 10 items: Graphic Tee — 2003 Tour Bootleg Style, Vintage Band Tee — Faded Grey, Vintage Graphic Hoodie — Faded Black … +7 more
+[2] suggest_outfit
+      in:  dict with keys: new_item, wardrobe
+      out: Hey there! I’m so excited you’re eyeing this 2003 tour bootleg-style graphic tee. At $24, a worn-in, boxy blac…
+[3] create_fit_card
+      in:  dict with keys: outfit, new_item
+      out: Channel major off-duty icon energy with this 2003 tour bootleg graphic tee, featuring that ultimate perfectly …
 ```
 
 **Empty search**
 
 ```
-
+$ python app.py ask 'Wedding dress under $3' --trace
+[1] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: [] (empty)
+[2] branch
+      →    empty search, stopping
 ```
 
-**On the MCP move:** <!-- what changed in your code, and whether anything
-behaved differently afterwards. If the rewire didn't work, say exactly where it
-broke — the error text and the last thing that worked. That earns the point in
-full. -->
+**On the MCP move:** 
+
+Registered `search_listings` in `mcp_server.py` using `@mcp.tool()` with typed inputs (`description: str`, `size: str | None = None`, `max_price: float | None = None`) matching the Tool Inventory, along with a clear one-line description detailing inputs, dollar pricing, and empty return behavior. In `agent.py::run_agent`, replaced the direct function call with `mcp_client.call_tool("search_listings", {...})`.
+
+The call changed shape to communicate over MCP JSON-RPC/stdio, but what came back did not change at all: `call_tool` unwraps the response into the exact same list of dictionaries previously returned by the direct call. Downstream tools and planning logic receive identical session state, confirming full functional equivalence.
 
 
 
