@@ -449,9 +449,27 @@ Yes, it completely broke the repetitive cliché template while maintaining a 5/5
 
 ## What's Still Broken
 
-<!-- For each criterion still missed: what you'd do, and why you stopped where
-     you did. "I ran out of time" is fine if it's true. Pretending nothing is
-     left is not. -->
+While all five formal benchmark criteria scored 5/5 on the evaluation suite, an honest inspection of the system reveals several remaining failure modes and architectural limitations:
+
+1. **Residual Opening Pattern in Fit Cards (Criterion 5 edge case):**
+   - *What happens:* While the negative constraints introduced in Milestone 5 successfully eliminated the `"Channel your inner..."` cliché across all 5 runs, the model gravitated toward another recurring opening phrase: three out of five runs for the flannel shirt began with `"Nothing beats the..."` (*"Nothing beats the heavy, lived-in feel..."*, *"Nothing beats the heritage warmth..."*).
+   - *What I'd do:* Negative constraint lists are reactive and cannot anticipate every stock pattern. A complete solution would dynamically inject distinct stylistic angles per call (e.g. alternating between historical context, garment texture, and bold styling takes) or track recently generated openers in session state to enforce a cross-call n-gram uniqueness penalty.
+   - *Why I stopped:* Implementing cross-call memory or dynamic angle injection requires expanding the session schema and changing the stateless signature of `create_fit_card`. The single prompt constraint was the highest-leverage targeted change for this unit.
+
+2. **Fragile Regex Query Parsing (`agent.py`):**
+   - *What happens:* `parse_query()` uses regular expressions to extract `max_price` and `size`. It cannot understand compound constraints ("under $30 excluding shipping"), price ranges ("between $20 and $30"), negative filters ("no crop tops", "not distressed"), or colloquial expressions ("around twenty bucks"). Any non-standard phrase either gets dropped or stays stuck inside the search description.
+   - *What I'd do:* Replace regex matching with an LLM structured extraction step or a formal intent parser that converts natural language into a validated JSON filter schema before invoking `search_listings`.
+   - *Why I stopped:* Regex was sufficient for all defined benchmark scenarios. Adding an LLM call ahead of the search step introduces additional latency and cost for every turn.
+
+3. **Greedy Single-Item Selection (`agent.py`):**
+   - *What happens:* When `search_listings` returns multiple relevant items, the agent blindly selects `search_results[0]` to style. It does not compare the candidate items against the user's specific wardrobe to see which piece would yield the most versatile or cohesive outfit.
+   - *What I'd do:* Add an intermediate selection step that scores candidate items against the wardrobe's dominant styles, colors, and gaps before passing the winner to `suggest_outfit`.
+   - *Why I stopped:* The course architecture prescribes a three-tool sequence (`search_listings` -> `suggest_outfit` -> `create_fit_card`). Modifying the control flow to include multi-item candidate evaluation would exceed the scope of the unit.
+
+4. **Empty Wardrobe Styling Depth (`tools.py`):**
+   - *What happens:* When a user has an empty wardrobe (`--empty-wardrobe`), `suggest_outfit` falls back to general styling advice since it has no personal garments to pair against. While it prevents crashes, it cannot offer concrete outfit recipes.
+   - *What I'd do:* In empty-wardrobe mode, have the agent search the listings catalog for 2–3 complementary items to build a complete starter capsule around the selected piece.
+   - *Why I stopped:* The unit requirement was to gracefully handle the empty wardrobe failure mode without erroring out. The general advice fallback met that requirement cleanly.
 
 
 
