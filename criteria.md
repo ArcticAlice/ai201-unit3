@@ -75,7 +75,12 @@ attention 4 out of 5 times.
 
 This target is reasonable as it is not always possible to create a hook
 for every clothing item. There may also be a scenario where a hook is 
-possible but it would make the caption sound weird.c
+possible but it would make the caption sound weird.
+
+> **Revised in unit 4:** Across 5 runs on the same item, the 5 fit cards share no opening 4-word phrase.
+>
+> **Why revised:** "Unique hook" wasn't clearly checkable—each try had an attention-grabbing hook in isolation, but 4 of the 5 tries used the exact same template opener ("Channel your inner 90s icon with..."). The revision provides an objective, measurable standard for hook uniqueness and variety across generations.
+
 
 
 ---
