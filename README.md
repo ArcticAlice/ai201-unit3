@@ -261,6 +261,12 @@ Stop scrolling because the holy grail of denim has officially entered the chat. 
 - *What came back:* Claude broke it down into a few things: start with a hook that grabs attention, mention details you can feel (texture, wash, fabric, something unusual about the piece), keep it short at 2 to 4 sentences, and work the price and platform in naturally.
 - *What I changed:* I turned that advice into two criteria in `criteria.md`. Criterion 4 requires specific details like color, texture, or pattern, and Criterion 5 requires an opening hook. Then I rewrote the prompt in `create_fit_card()` in `tools.py` to spell out those same requirements, including a hard limit of 2 to 4 sentences.
 
+**Moment 3 (Unit 4)**
+
+- *What I asked for:* After discovering in the Unit 4 before-evaluation that four out of five runs for the flannel shirt generated the exact same cliché opening ("Channel your inner 90s icon with..."), I asked AI how to prevent model repetition and cliché template collapse across repeated generation calls on the same item without lowering temperature or making the caption read robotically.
+- *What came back:* Claude recommended negative constraint prompting—explicitly listing forbidden stock openers (e.g. "Channel your inner...", "Stop scrolling...", "The holy grail...") while instructing the model to vary sentence structures and opening approaches (sensory details, bold claims, questions).
+- *What I changed:* I incorporated negative constraints directly into guideline 2 of `create_fit_card` in `tools.py` while explicitly prompting for varied sentence structure. Re-running the evaluation confirmed that zero out of five tries repeated the "Channel your inner..." cliché, successfully increasing lexical and stylistic diversity across runs.
+
 <!-- ═══════════════════════ UNIT 4 — THE TEST ═══════════════════════
 
      Don't fill these in during unit 3.
@@ -419,23 +425,23 @@ The call changed shape to communicate over MCP JSON-RPC/stdio, but what came bac
      `python run_eval.py --label after` -->
 
 **What I changed:**
+Rewrote guideline 2 in the `create_fit_card()` prompt (`tools.py`) to add explicit negative constraints against generic AI clichés (`"Channel your inner..."`, `"Stop scrolling..."`, `"The holy grail..."`) and instructed the model to vary sentence structures and opening approaches (such as leading with sensory details or unexpected styling observations).
 
 **Which failure it was meant to fix:**
+Criterion 5's repetitive template collapse. In the before-run, 4 out of 5 generations for the oversized flannel shirt opened with the exact same cliché phrase (*"Channel your inner 90s icon with..."*).
 
 ### Run Log — After
 
 | Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
 | --------- | ------ | ----- | ----- | ----- | ----- | ----- | ------- |
-| 1.        |        |       |       |       |       |       |         |
-| 2.        |        |       |       |       |       |       |         |
-| 3.        |        |       |       |       |       |       |         |
-| 4.        |        |       |       |       |       |       |         |
-| 5.        |        |       |       |       |       |       |         |
+| 1. A matching query completes all three tools | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 2. An impossible query stops before the second tool | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 3. The selected item in session state matches what suggest_outfit receives | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 4. A caption must include some descriptive factor on the clothing item | 5 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
+| 5. A caption must include a hook | 4 of 5 | PASS | PASS | PASS | PASS | PASS | MET (5/5) |
 
 **Did it help, and how do I know:**
-
-<!-- If it made things worse, say that. Honestly reported, that earns full
-     credit and is more interesting than one that worked. -->
+Yes, it completely broke the repetitive cliché template while maintaining a 5/5 pass rate: zero out of five tries repeated the "Channel your inner..." opening, and each fit card opened with varied, sensory-rich hooks across runs (e.g. *"Nothing beats the heavy, lived-in feel..."*, *"Wrap yourself in the heavyweight warmth..."*, *"Nothing beats the heritage warmth..."*).
 
 
 
