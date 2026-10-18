@@ -279,19 +279,45 @@ Stop scrolling because the holy grail of denim has officially entered the chat. 
      `python run_eval.py --label before` runs everything and writes the table
      into results/. Paste it here and fill in the verdicts. -->
 
-| Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
-| --------- | ------ | ----- | ----- | ----- | ----- | ----- | ------- |
-| 1.        |        |       |       |       |       |       |         |
-| 2.        |        |       |       |       |       |       |         |
-| 3.        |        |       |       |       |       |       |         |
-| 4.        |        |       |       |       |       |       |         |
-| 5.        |        |       |       |       |       |       |         |
+| Criterion                                                                  | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict   |
+| -------------------------------------------------------------------------- | ------ | ----- | ----- | ----- | ----- | ----- | --------- |
+| 1. A matching query completes all three tools                              | 4 of 5 | PASS  | PASS  | PASS  | PASS  | PASS  | MET (5/5) |
+| 2. An impossible query stops before the second tool                        | 5 of 5 | PASS  | PASS  | PASS  | PASS  | PASS  | MET (5/5) |
+| 3. The selected item in session state matches what suggest_outfit receives | 5 of 5 | PASS  | PASS  | PASS  | PASS  | PASS  | MET (5/5) |
+| 4. A caption must include some descriptive factor on the clothing item     | 5 of 5 | PASS  | PASS  | PASS  | PASS  | PASS  | MET (5/5) |
+| 5. A caption must include a hook                                           | 4 of 5 | PASS  | PASS  | PASS  | PASS  | PASS  | MET (5/5) |
 
 **Real output from one try**, pasted as text, naming the file and function
 that produced it:
 
 ```
+Criterion 1 (`agent.py::run_agent`, Try 1):
+Query: 'vintage graphic tee under $30'
+- stopped early: no
+- selected_item: Graphic Tee — 2003 Tour Bootleg Style ($24.0, depop)
+- search_results: 10
+Fit card:
+"Unearth your inner rockstar with this ultimate 2003 tour bootleg graphic tee, featuring that perfectly faded graphic and buttery-soft, broken-in cotton feel! This dreamy black streetwear staple is up for grabs on Depop for just $24.00. Snag it now before it's gone and level up your grunge rotation!"
 
+Criterion 2 (`agent.py::run_agent`, Try 1):
+Query: 'designer ballgown size XXS under $5'
+- stopped early: yes — No matching listings found for 'designer ballgown'. Try raising your price ceiling (currently $5.00) or checking alternative sizes (currently XXS) or using broader search keywords or fewer filters.
+- selected_item: (none)
+- search_results: 0
+
+Criterion 3 (`agent.py::run_agent`, Try 1):
+Query: 'vintage levis jeans under $45'
+- stopped early: no
+- selected_item: Vintage Levi's 501 Jeans — Medium Wash ($38.0, depop)
+- search_results: 10 (lst_001 matches selected_item passed to suggest_outfit)
+
+Criterion 4 (`tools.py::create_fit_card`, Try 1):
+Item: Knit Cardigan — Chunky Brown ($35.0, depop)
+"Consider this your official sign to romanticize your autumn wardrobe with the ultimate vintage chunky brown knit cardigan. Drenched in a rich earth-tone palette with ultra-plush texturing, this oversized treasure feels just like wearing a warm hug. Grab it on Depop right now for an absolute steal at just $35.00 before someone else snags your new favorite layering piece!"
+
+Criterion 5 (`tools.py::create_fit_card`, Try 1):
+Item: Oversized Flannel Shirt — Plaid Red/Black ($22.0, thredUp)
+"Nothing screams 90s grunge quite like a heavy-duty vintage red-and-black buffalo plaid! Score this iconic oversized Woolrich flannel for just $22.00 on thredUp and instantly level up your layering game. Throw it on over a ribbed tank or layer it with a hoodie for the ultimate streetwear aesthetic."
 ```
 
 ---
@@ -314,15 +340,21 @@ that produced it:
      Look for a pattern. Three misses on the same tool is one problem, not
      three. -->
 
-| #   | Criterion | Target | Verdict | How I decided |
-| --- | --------- | ------ | ------- | ------------- |
-| 1   |           |        |         |               |
-| 2   |           |        |         |               |
-| 3   |           |        |         |               |
-| 4   |           |        |         |               |
-| 5   |           |        |         |               |
+| # | Criterion                                                               | Target | Verdict   | How I decided |
+
+| 1 | A matching query completes all three tools                              | 4 of 5 | MET (5/5) | In all 5 tries, the agent searched listings, suggested outfits, and generated a fit card without stopping early or erroring.
+
+| 2 | An impossible query stops before the second tool                        | 5 of 5 | MET (5/5) | In all 5 tries, search returned 0 items and the loop immediately halted at the branch, returning a clear error naming what to adjust.
+
+| 3 | The selected item in session state matches what suggest_outfit receives | 5 of 5 | MET (5/5) | In all 5 tries, session["selected_item"] was identical in ID, title, and metadata to session["search_results"][0] and passed cleanly to suggest_outfit.
+
+| 4 | A caption must include some descriptive factor on the clothing item     | 5 of 5 | MET (5/5) | In all 5 tries, the generated caption explicitly highlighted tactile and visual traits (e.g. "chunky brown knit", "earth-tone palette", "ultra-plush texturing"). |
+
+| 5 | A caption must include a hook                                           | 4 of 5 | MET (5/5) | In all 5 tries, the caption opened with an engaging, attention-grabbing hook (e.g. "Nothing screams 90s grunge quite like...").
 
 **Diagnoses**
+
+All five criteria met or exceeded their target rates (5/5 passes across all categories). State passing and early termination branches operated completely deterministically in Python, while the explicit copywriting guidelines in the `create_fit_card` prompt reliably steered the Gemini model to incorporate distinct hooks and descriptive sensory factors on every single run.
 
 
 
