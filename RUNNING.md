@@ -6,22 +6,35 @@ Everything about how the starter works and how to use it.
 
 ## Capstone: Wardrobe-Aware Occasion Stylist (Path B: Local with Logs)
 
-### Environment Prerequisites
-- **Operating System:** macOS, Linux, or Windows
-- **Python Version:** Python 3.11+ (Tested on Python 3.13.18)
-- **Dependencies:** Listed in `requirements.txt` (including `google-genai`, `mcp`, `python-dotenv`, `pydantic`)
-- **API Key:** `GEMINI_API_KEY` set in `.env` (Google AI Studio Gemini API key)
-- **Local Datastores:** `data/wardrobe_schema.json` (10 curated wardrobe items) and `data/listings.json` (40 catalog listings)
+### First-Time Setup (From a Clean Clone)
+
+If you are a peer testing this repository, follow these 4 steps to set up your environment:
+
+**macOS / Linux:**
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env          # Paste your GEMINI_API_KEY into .env
+python test.py                # Verify all checks pass
+```
+
+**Windows (PowerShell):**
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+copy .env.example .env         # Paste your GEMINI_API_KEY into .env
+python test.py                 # Verify all checks pass
+```
+
+---
 
 ### One-Command Quickstart
 
-From a terminal in the project root:
+Once your virtual environment is active, run the Occasion Stylist:
 
 ```bash
-# 1. Activate virtual environment
-source .venv/bin/activate
-
-# 2. Run the Capstone Occasion Stylist (Single Command)
 python app.py occasion 'casual Sunday brunch with friends'
 ```
 
