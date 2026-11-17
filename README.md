@@ -510,3 +510,24 @@ While all five formal benchmark criteria scored 5/5 on the evaluation suite, an 
 ---
 
 📖 **How to run this project: [RUNNING.md](RUNNING.md)**
+
+## Capstone
+
+**What This Extends**
+
+This capstone extends **FitFindr**, the autonomous fashion styling and thrift discovery agent built in Units 3 and 4. In its original form, FitFindr took search queries for new clothing items, retrieved candidate listings over MCP, evaluated whether to buy them against an existing wardrobe (`suggest_outfit`), and generated social captions (`create_fit_card`).
+
+What is new is the **Wardrobe-Aware Occasion Stylist**: an intelligent styling capability that takes an occasion (e.g., *"casual Sunday brunch"*, *"tech interview"*, *"rainy outdoor concert"*) and an existing wardrobe inventory, evaluates formality and practical requirements, strictly selects coordinating garments from what the user already owns across multiple categories (tops, bottoms, shoes, outerwear/accessories), and provides a grounded rationale citing the specific colors, materials, and style tags of the selected pieces. Crucially, it incorporates negative guardrails to detect and reject occasions that the wardrobe cannot fulfill (such as formal black-tie events for an all-streetwear closet), rather than hallucinating non-existent items or making inappropriate suggestions.
+
+**The Shape**
+
+**Shape C — Extend ONE capability.** 
+
+The extension adds one new operational agent capability: occasion-based outfit recommendation grounded exclusively in a local wardrobe repository.
+
+*What is out of scope:*
+1. **Interactive terminal menu loops:** We are not building a multi-step interactive CLI questionnaire, curses interface, or CRUD menu. The extension runs directly via a single deterministic CLI command.
+2. **Dynamic wardrobe mutation:** We are not adding interactive features to add, delete, or edit wardrobe items on disk during a session. The wardrobe schema remains a clean, validated JSON datastore.
+3. **Computer vision and visual outfit rendering:** We are not integrating image generation (e.g. Imagen/DALL-E) or computer vision analysis of clothing images. All styling reasoning is performed on structured textual metadata.
+4. **Third-party live weather or calendar APIs:** We are not pulling live weather conditions or syncing Google Calendar events; occasions are supplied directly as natural language prompts.
+**
