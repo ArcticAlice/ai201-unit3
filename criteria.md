@@ -116,3 +116,60 @@ possible but it would make the caption sound weird.
      A number you missed stays where it is, gets diagnosed, and gets a fix
      attempted. That's where the points are.
      ───────────────────────────────────────────────────────────────────────── -->
+
+---
+
+# Capstone Acceptance Criteria — Wardrobe-Aware Occasion Stylist
+
+Five acceptance criteria for the Capstone extension (Shape C: Wardrobe-Aware Occasion Stylist), written **before** any evaluation results existed.
+
+---
+
+## 1. Strict Wardrobe Grounding & Multi-Piece Coordination
+
+Given a valid occasion and the user's wardrobe, the agent must assemble an outfit composed of at least 3 distinct categories (e.g. top, bottom, shoes) where **100% of recommended item IDs strictly match valid IDs existing in the user's `wardrobe.json` with zero hallucinated pieces** across 5 test trials — in 5 of 5 tries.
+
+**Why this target:**
+
+LLMs frequently hallucinate complementary essentials (e.g., "pair with basic white sneakers and chinos") when a closet lacks a specific piece. A 5 of 5 zero-hallucination requirement forces strict retrieval and validation against the JSON inventory. Any single invented ID or phantom garment constitutes a failure.
+
+---
+
+## 2. Grounded Attribute-Driven Occasion Justification
+
+Across 5 distinct test occasions spanning different dress formality levels (e.g., casual brunch, study session, street art gallery, minimalist coffee, rainy outdoor walk), the styling rationale must explicitly cite at least one specific attribute metadata field (`style_tags`, `colors`, or `notes`) for every selected piece to justify how it satisfies the dress code or functional demands of the occasion — in at least 4 of 5 tries.
+
+**Why this target:**
+
+Stylists frequently default to generic platitudes ("this looks stylish"). Demanding that the model ground its reasoning in the specific schema attributes of all selected pieces is a strict, measurable standard. A 4 of 5 target accounts for minor prompt non-determinism where an accessory might be mentioned without explicitly quoting its tags.
+
+---
+
+## 3. Incompatible Wardrobe & Dress Code Gap Detection (Bad Path)
+
+When presented with an occasion that the wardrobe fundamentally cannot fulfill (e.g., "black-tie opera gala", "scuba diving expedition", "Olympic fencing championship"), the agent must halt, refuse to recommend an inappropriate casual outfit, and return an explicit warning specifying the missing garment categories or formality gap — in 5 of 5 tries.
+
+**Why this target:**
+
+Models are naturally biased toward eager helpfulness and will often inappropriately recommend t-shirts and combat boots to a black-tie gala unless strictly constrained. Catching impossible dress codes tests the negative/failure path deterministically and semantically. A 5 of 5 target ensures the guard never slips.
+
+---
+
+## 4. Execution Latency & Structured Observability Benchmark
+
+When executed via the CLI, 100% of runs must append a valid JSON structured log record to `logs/session_runs.jsonl` with all required fields (timestamp, occasion, item IDs, token counts, duration, and status), with an end-to-end duration under **2.5 seconds** on warm requests across 5 trials — in at least 4 of 5 tries.
+
+**Why this target:**
+
+A 2.5-second ceiling for live LLM reasoning, schema validation, and structured file writing is an aggressive operational target. Latency spikes over public network connections or slow token generation can easily push runs past 2.5s, making this an authentic, challenging benchmark.
+
+---
+
+## 5. Regression Safety on Core FitFindr Loop
+
+The baseline FitFindr thrift search and fit card creation pipeline (`app.py ask`) continues to execute without errors, successfully returning a non-empty outfit suggestion and fit card on a standard valid query (e.g., "vintage graphic tee under $30") — in 5 of 5 tries.
+
+**Why this target:**
+
+Extensions must not cause regressions in existing MCP tool calling, session state flow, or prompt synthesis. Since this tests deterministic tool coordination with cached/live generation, 5 of 5 is required.
+
