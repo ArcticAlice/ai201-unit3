@@ -586,3 +586,76 @@ Every run of the Occasion Stylist records a structured JSON record into `logs/se
   $$\text{Daily Cost} = 100 \text{ runs/day} \times \$0.000135/\text{run} = \mathbf{\$0.0135/\text{day}} \text{ (1.35 cents/day)}$$
   $$\text{Monthly Cost (30 days)} = 30 \times \$0.0135 = \mathbf{\$0.405/\text{month}} \text{ (approx. 41 cents/month)}$$
 
+**Run Log and Verdicts**
+
+The 5 capstone criteria were tested across three independent evaluation trials (Run 1, Run 2, Run 3) using `eval_capstone.py`.
+
+| Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
+|---|---|---|---|---|---|
+| **1. Strict Wardrobe Grounding** | 5 of 5 | 5/5 | 5/5 | 5/5 | **MET** |
+| **2. Grounded Attribute Justification** | 4 of 5 | 5/5 | 5/5 | 5/5 | **MET** |
+| **3. Incompatible Wardrobe Gap Detection** | 5 of 5 | 5/5 | 5/5 | 5/5 | **MET** |
+| **4. Latency & Observability (< 2.5s)** | 4 of 5 | 0/5 | 0/5 | 0/5 | **MISSED** |
+| **5. Regression Safety on FitFindr** | 5 of 5 | 5/5 | 5/5 | 5/5 | **MET** |
+
+---
+
+### Real Output Samples (Before Fix)
+
+**Criterion 1 (Strict Wardrobe Grounding) & Criterion 2 (Grounded Attribute Justification)**
+- *Produced by:* `occasion_stylist.py::style_for_occasion`
+- *Input Occasion:* `"informal streetwear art gallery opening"`
+- *Selected IDs:* `['w_001', 'w_005', 'w_006', 'w_007', 'w_010']` (100% valid wardrobe pieces: bottoms, tops, outerwear, shoes, accessories)
+- *Actual Output Rationale:*
+> *"For an informal streetwear art gallery opening, the outfit balances artistic edge with casual comfort. We start with the bottoms: [w_001] Baggy straight-leg jeans in dark blue/indigo, featuring 'denim, streetwear, baggy' style tags that establish an effortless, trend-forward streetwear base. For the top, [w_005] Black cropped zip hoodie with 'streetwear' and 'cropped' tags pairs well with the high-waisted cut of the jeans. Layered over this is [w_006] Vintage black denim jacket, featuring 'denim, vintage, classic' style tags and a 'slightly cropped' note that adds depth and a cool layered texture ideal for an art scene. For footwear, [w_007] Chunky white sneakers with 'sneakers, chunky, streetwear' tags bring a modern, gallery-appropriate comfort and urban appeal. Finally, [w_010] Black crossbody bag with 'minimal, accessories, everyday' tags ties the dark color palette together while keeping hands-free convenience for browsing art."*
+
+**Criterion 3 (Incompatible Wardrobe Gap Detection — Bad Path)**
+- *Produced by:* `occasion_stylist.py::style_for_occasion`
+- *Input Occasion:* `"Olympic fencing championship tournament duel"`
+- *Actual Output (Raw JSON):*
+```json
+{
+  "status": "incompatible",
+  "occasion": "Olympic fencing championship tournament duel",
+  "selected_items": [],
+  "selected_ids": [],
+  "selected_categories": [],
+  "explanation": "The wardrobe inventory consists entirely of casual streetwear, basics, and denim (such as baggy jeans, crewneck sweatshirts, and combat boots). An Olympic fencing championship tournament duel requires specialized, highly technical protective gear—including an FIE-certified fencing mask, puncture-resistant jacket, breeches, and weapons—none of which are present in the available wardrobe. Therefore, the wardrobe is completely incompatible with the functional and safety requirements of this occasion.",
+  "warning": "The wardrobe inventory consists entirely of casual streetwear, basics, and denim... An Olympic fencing championship tournament duel requires specialized, highly technical protective gear...",
+  "missing_garments": [
+    "Fencing mask",
+    "Fencing jacket (PBT or similar protective gear conforming to FIE regulations)",
+    "Fencing breeches",
+    "Puncture-resistant underplastron",
+    "Fencing shoes / indoor court shoes",
+    "Foil, epee, or saber weapon"
+  ]
+}
+```
+
+**Criterion 4 (Latency & Observability Benchmark)**
+- *Produced by:* `logger.py::log_run` via `occasion_stylist.py::_finalize`
+- *Actual Raw Log Record:*
+```json
+{"timestamp": "2026-11-17T00:33:37.451552+00:00", "run_id": "3b02060d", "action": "occasion_styling", "status": "success", "input": {"occasion": "minimalist coffee date", "wardrobe_item_count": 10}, "output": {"selected_ids": ["w_002", "w_003", "w_007", "w_010"], "selected_categories": ["tops", "bottoms", "accessories", "shoes"], "missing_garments": []}, "duration_sec": 1.428, "tokens": {"prompt": 710, "output": 243, "total": 953}, "cost_usd": 0.0001262, "error_or_warning": null}
+```
+
+**Criterion 5 (Regression Safety on FitFindr Loop)**
+- *Produced by:* `agent.py::run_agent` -> `tools.py::create_fit_card`
+- *Input Query:* `"vintage graphic tee under $30"`
+- *Actual Fit Card Output:*
+> *"Rock that effortless 2003 tour energy in this butter-soft, perfectly faded black bootleg tee. Scoring this 100% cotton grunge staple for just $24.00 on Depop is practically a steal. Throw it on with baggy denim and combat boots for instant off-duty model vibes!"*
+
+---
+
+### Diagnosis of Missed Criterion
+
+**Criterion 4 Missed (0/5 across Runs 1, 2, and 3):**
+- **Stage:** Caching subsystem (`generate.py::_cache_read`) and token instrumentation delta calculation (`occasion_stylist.py::_finalize`).
+- **Mechanism:** In `config.py`, `CACHE_ENABLED` is set to `True` by default for interactive development. When `eval_capstone.py` was executed, repeated queries with identical prompt strings hit `config.CACHE_DIR/*.json`. While response text was recovered instantly (yielding sub-millisecond durations of `0.0001s`), `generate.py` only cached the string response:
+  ```python
+  {"response": response}
+  ```
+  It did not persist token metadata in the cache file, nor did it increment `_prompt_tokens` and `_output_tokens` on a cache hit. As a result, `token_counts()` before and after the call returned identical values (`tokens_diff["total"] == 0`). Because Criterion 4 required `has_tokens = tokens_diff["total"] > 0` to verify observability, every single cached test run failed the token presence check and was scored as a miss (`0/5`), despite being under 2.5 seconds.
+
+
