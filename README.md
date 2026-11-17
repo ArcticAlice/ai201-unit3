@@ -530,4 +530,59 @@ The extension adds one new operational agent capability: occasion-based outfit r
 2. **Dynamic wardrobe mutation:** We are not adding interactive features to add, delete, or edit wardrobe items on disk during a session. The wardrobe schema remains a clean, validated JSON datastore.
 3. **Computer vision and visual outfit rendering:** We are not integrating image generation (e.g. Imagen/DALL-E) or computer vision analysis of clothing images. All styling reasoning is performed on structured textual metadata.
 4. **Third-party live weather or calendar APIs:** We are not pulling live weather conditions or syncing Google Calendar events; occasions are supplied directly as natural language prompts.
-**
+
+**Running It**
+
+**Path B — Local with logs.**
+
+The system runs entirely locally on the developer machine and is started with a single documented terminal command:
+```bash
+python app.py occasion 'casual Sunday brunch with friends'
+```
+See [RUNNING.md](RUNNING.md) for full setup instructions, python environment dependencies, model configuration, and failure-mode test commands.
+
+**Instrumentation**
+
+Every run of the Occasion Stylist records a structured JSON record into `logs/session_runs.jsonl`. Each record holds:
+- `timestamp`: ISO 8601 UTC timestamp of execution
+- `run_id`: Unique 8-character session UUID
+- `action`: The executed subsystem (`occasion_styling`)
+- `status`: Outcome verdict (`success`, `incompatible`, `error`)
+- `input`: Dictionary containing `occasion` string and `wardrobe_item_count`
+- `output`: Dictionary containing `selected_ids`, `selected_categories`, and `missing_garments`
+- `duration_sec`: Measured end-to-end latency in seconds
+- `tokens`: Dictionary containing `prompt`, `output`, and `total` tokens reported by the API
+- `cost_usd`: Exact dollar cost calculated from token counts ($0.075/1M prompt, $0.30/1M output)
+- `error_or_warning`: Diagnostic reason if rejected, incompatible, or errored
+
+*12 Committed Log Records (8 successful runs, 2 incompatible dress codes, 1 malformed input error, 1 empty wardrobe rejection):*
+
+```json
+{"timestamp": "2026-11-17T00:33:33.155961+00:00", "run_id": "90619a22", "action": "occasion_styling", "status": "success", "input": {"occasion": "casual Sunday brunch with friends", "wardrobe_item_count": 10}, "output": {"selected_ids": ["w_001", "w_003", "w_007", "w_010"], "selected_categories": ["tops", "bottoms", "accessories", "shoes"], "missing_garments": []}, "duration_sec": 2.3565, "tokens": {"prompt": 712, "output": 276, "total": 988}, "cost_usd": 0.0001362, "error_or_warning": null}
+{"timestamp": "2026-11-17T00:33:34.439923+00:00", "run_id": "b42a39a6", "action": "occasion_styling", "status": "success", "input": {"occasion": "chilly evening study session at the library", "wardrobe_item_count": 10}, "output": {"selected_ids": ["w_004", "w_001", "w_007", "w_010"], "selected_categories": ["bottoms", "tops", "accessories", "shoes"], "missing_garments": []}, "duration_sec": 1.2835, "tokens": {"prompt": 714, "output": 260, "total": 974}, "cost_usd": 0.0001315, "error_or_warning": null}
+{"timestamp": "2026-11-17T00:33:36.023209+00:00", "run_id": "4b9f40fb", "action": "occasion_styling", "status": "success", "input": {"occasion": "informal streetwear art gallery opening", "wardrobe_item_count": 10}, "output": {"selected_ids": ["w_001", "w_005", "w_006", "w_007", "w_010"], "selected_categories": ["outerwear", "bottoms", "shoes", "tops", "accessories"], "missing_garments": []}, "duration_sec": 1.5831, "tokens": {"prompt": 712, "output": 322, "total": 1034}, "cost_usd": 0.00015, "error_or_warning": null}
+{"timestamp": "2026-11-17T00:33:37.451552+00:00", "run_id": "3b02060d", "action": "occasion_styling", "status": "success", "input": {"occasion": "minimalist coffee date", "wardrobe_item_count": 10}, "output": {"selected_ids": ["w_002", "w_003", "w_007", "w_010"], "selected_categories": ["tops", "bottoms", "accessories", "shoes"], "missing_garments": []}, "duration_sec": 1.428, "tokens": {"prompt": 710, "output": 243, "total": 953}, "cost_usd": 0.0001262, "error_or_warning": null}
+{"timestamp": "2026-11-17T00:33:38.682985+00:00", "run_id": "b3180296", "action": "occasion_styling", "status": "success", "input": {"occasion": "grunge band rehearsal in a garage", "wardrobe_item_count": 10}, "output": {"selected_ids": ["w_001", "w_003", "w_006", "w_008"], "selected_categories": ["tops", "outerwear", "bottoms", "shoes"], "missing_garments": []}, "duration_sec": 1.2312, "tokens": {"prompt": 713, "output": 271, "total": 984}, "cost_usd": 0.0001348, "error_or_warning": null}
+{"timestamp": "2026-11-17T00:33:40.118251+00:00", "run_id": "2e6a1d81", "action": "occasion_styling", "status": "success", "input": {"occasion": "rainy day walking around downtown", "wardrobe_item_count": 10}, "output": {"selected_ids": ["w_001", "w_004", "w_008", "w_010"], "selected_categories": ["tops", "bottoms", "accessories", "shoes"], "missing_garments": []}, "duration_sec": 1.4349, "tokens": {"prompt": 712, "output": 278, "total": 990}, "cost_usd": 0.0001368, "error_or_warning": null}
+{"timestamp": "2026-11-17T00:33:41.344391+00:00", "run_id": "e399f85d", "action": "occasion_styling", "status": "success", "input": {"occasion": "relaxed Friday at a tech startup", "wardrobe_item_count": 10}, "output": {"selected_ids": ["w_004", "w_001", "w_007", "w_010"], "selected_categories": ["bottoms", "tops", "accessories", "shoes"], "missing_garments": []}, "duration_sec": 1.2257, "tokens": {"prompt": 713, "output": 256, "total": 969}, "cost_usd": 0.0001303, "error_or_warning": null}
+{"timestamp": "2026-11-17T00:33:42.776851+00:00", "run_id": "dd8b2519", "action": "occasion_styling", "status": "success", "input": {"occasion": "casual weekend farmer market trip", "wardrobe_item_count": 10}, "output": {"selected_ids": ["w_001", "w_003", "w_006", "w_007", "w_010"], "selected_categories": ["outerwear", "bottoms", "shoes", "tops", "accessories"], "missing_garments": []}, "duration_sec": 1.4322, "tokens": {"prompt": 712, "output": 318, "total": 1030}, "cost_usd": 0.0001488, "error_or_warning": null}
+{"timestamp": "2026-11-17T00:33:42.777264+00:00", "run_id": "7feb2bc6", "action": "occasion_styling", "status": "incompatible", "input": {"occasion": "black-tie gala dinner at the opera house", "wardrobe_item_count": 10}, "output": {"selected_ids": [], "selected_categories": [], "missing_garments": ["formal gown", "tuxedo", "dress shoes", "formal eveningwear"]}, "duration_sec": 0.0, "tokens": {"prompt": 0, "output": 0, "total": 0}, "cost_usd": 0.0, "error_or_warning": "The occasion 'black-tie gala dinner at the opera house' requires strict formal/black-tie attire, but your current wardrobe only contains casual, streetwear, and everyday basics."}
+{"timestamp": "2026-11-17T00:33:42.777662+00:00", "run_id": "845e99af", "action": "occasion_styling", "status": "incompatible", "input": {"occasion": "scuba diving coral reef expedition", "wardrobe_item_count": 10}, "output": {"selected_ids": [], "selected_categories": [], "missing_garments": ["swimsuit", "swim trunks", "water shoes"]}, "duration_sec": 0.0, "tokens": {"prompt": 0, "output": 0, "total": 0}, "cost_usd": 0.0, "error_or_warning": "The occasion 'scuba diving coral reef expedition' requires swimwear or aquatic apparel, which is not present in your wardrobe."}
+{"timestamp": "2026-11-17T00:33:42.778179+00:00", "run_id": "ac7558f8", "action": "occasion_styling", "status": "error", "input": {"occasion": "", "wardrobe_item_count": 10}, "output": {"selected_ids": [], "selected_categories": [], "missing_garments": []}, "duration_sec": 0.0, "tokens": {"prompt": 0, "output": 0, "total": 0}, "cost_usd": 0.0, "error_or_warning": "No occasion was specified. Please provide an occasion (e.g. 'casual brunch', 'tech interview')."}
+{"timestamp": "2026-11-17T00:33:42.778624+00:00", "run_id": "b54b3a38", "action": "occasion_styling", "status": "incompatible", "input": {"occasion": "casual coffee date", "wardrobe_item_count": 0}, "output": {"selected_ids": [], "selected_categories": [], "missing_garments": []}, "duration_sec": 0.0, "tokens": {"prompt": 0, "output": 0, "total": 0}, "cost_usd": 0.0, "error_or_warning": "Wardrobe is empty. Cannot assemble an outfit without items."}
+```
+
+**What It Costs**
+
+- **Measurement Methodology:** Token counts were captured directly from the Gemini API `usage_metadata` via `generate.py` across real runs. Monetary cost was calculated using official Google Gemini 3.5 Flash Lite pricing: $0.075 per 1,000,000 prompt tokens and $0.30 per 1,000,000 output tokens.
+- **Measured Cost Per Successful Run:**
+  - Prompt tokens: 712 tokens ($0.0000534)
+  - Output tokens: 272 tokens ($0.0000816)
+  - Total tokens: 984 tokens
+  - Cost per run: **$0.000135 / run** (~0.0135 cents)
+  - Latency: Average **1.50 seconds**
+- **Incompatible / Guarded Runs:** Runs that violate dress codes or have empty inputs are halted by deterministic guards before model invocation, costing **$0.000000** and **<0.001 seconds**.
+- **Hundred Users a Day Arithmetic:**
+  $$\text{Daily Cost} = 100 \text{ runs/day} \times \$0.000135/\text{run} = \mathbf{\$0.0135/\text{day}} \text{ (1.35 cents/day)}$$
+  $$\text{Monthly Cost (30 days)} = 30 \times \$0.0135 = \mathbf{\$0.405/\text{month}} \text{ (approx. 41 cents/month)}$$
+

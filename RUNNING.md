@@ -4,6 +4,53 @@ Everything about how the starter works and how to use it.
 
 ---
 
+## Capstone: Wardrobe-Aware Occasion Stylist (Path B: Local with Logs)
+
+### Environment Prerequisites
+- **Operating System:** macOS, Linux, or Windows
+- **Python Version:** Python 3.11+ (Tested on Python 3.13.18)
+- **Dependencies:** Listed in `requirements.txt` (including `google-genai`, `mcp`, `python-dotenv`, `pydantic`)
+- **API Key:** `GEMINI_API_KEY` set in `.env` (Google AI Studio Gemini API key)
+- **Local Datastores:** `data/wardrobe_schema.json` (10 curated wardrobe items) and `data/listings.json` (40 catalog listings)
+
+### One-Command Quickstart
+
+From a terminal in the project root:
+
+```bash
+# 1. Activate virtual environment
+source .venv/bin/activate
+
+# 2. Run the Capstone Occasion Stylist (Single Command)
+python app.py occasion 'casual Sunday brunch with friends'
+```
+
+### Additional Run Paths & Failure Mode Triggers
+
+```bash
+# Interactive mode (prompts for occasion)
+python app.py occasion
+
+# Incompatible dress code failure test (refuses and warns instead of hallucinating)
+python app.py occasion 'black-tie opera gala dinner'
+
+# Empty wardrobe failure mode test
+python app.py occasion 'casual coffee date' --empty-wardrobe
+
+# Original regression check (Thrift search & buy loop)
+python app.py ask 'vintage graphic tee under $30'
+```
+
+### Observability & Run Logs
+Every run automatically appends a structured JSON Lines record to `logs/session_runs.jsonl`.
+To view the most recent run records:
+
+```bash
+tail -n 10 logs/session_runs.jsonl
+```
+
+---
+
 ## Before your first class
 
 Setup happens **before class**. The [environment setup page](../pages/ide_setup)

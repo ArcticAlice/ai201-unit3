@@ -11,6 +11,7 @@ import re
 import time
 from typing import Optional
 from generate import generate, token_counts, ModelUnavailable
+from logger import log_run
 
 
 def evaluate_occasion_compatibility(occasion: str, wardrobe_items: list[dict]) -> tuple[bool, str, list[str]]:
@@ -58,6 +59,38 @@ def evaluate_occasion_compatibility(occasion: str, wardrobe_items: list[dict]) -
     return (True, "", [])
 
 
+def _finalize(result: dict, start_time: float, tokens_before: dict, wardrobe_count: int) -> dict:
+    """Finalize metrics and write structured log record."""
+    duration = round(time.monotonic() - start_time, 4)
+    tokens_after = token_counts()
+    tokens_diff = {
+        "prompt": max(0, tokens_after["prompt"] - tokens_before["prompt"]),
+        "output": max(0, tokens_after["output"] - tokens_before["output"]),
+        "total": max(0, tokens_after["total"] - tokens_before["total"]),
+    }
+    result["duration_sec"] = duration
+    result["tokens_used"] = tokens_diff
+
+    # Write to structured log
+    log_run(
+        action="occasion_styling",
+        inputs={
+            "occasion": result.get("occasion"),
+            "wardrobe_item_count": wardrobe_count,
+        },
+        outputs={
+            "selected_ids": result.get("selected_ids", []),
+            "selected_categories": result.get("selected_categories", []),
+            "missing_garments": result.get("missing_garments", []),
+        },
+        duration_sec=duration,
+        tokens=tokens_diff,
+        status=result["status"],
+        error_or_warning=result.get("warning") or (result["explanation"] if result["status"] != "success" else None),
+    )
+    return result
+
+
 def style_for_occasion(occasion: str, wardrobe: dict) -> dict:
     """
     Given an occasion string and a wardrobe dict, return a recommended outfit
@@ -92,17 +125,17 @@ def style_for_occasion(occasion: str, wardrobe: dict) -> dict:
     }
 
     cleaned_occ = (occasion or "").strip()
+    items = wardrobe.get("items", []) if isinstance(wardrobe, dict) else []
+    wardrobe_count = len(items)
+
     if not cleaned_occ:
         result["warning"] = "No occasion was specified. Please provide an occasion (e.g. 'casual brunch', 'tech interview')."
-        result["duration_sec"] = round(time.monotonic() - start_time, 3)
-        return result
+        return _finalize(result, start_time, tokens_before, wardrobe_count)
 
-    items = wardrobe.get("items", []) if isinstance(wardrobe, dict) else []
     if not items:
         result["status"] = "incompatible"
         result["warning"] = "Wardrobe is empty. Cannot assemble an outfit without items."
-        result["duration_sec"] = round(time.monotonic() - start_time, 3)
-        return result
+        return _finalize(result, start_time, tokens_before, wardrobe_count)
 
     # 1. Deterministic compatibility pre-check for extreme edge cases
     is_compat, reason, missing = evaluate_occasion_compatibility(cleaned_occ, items)
@@ -110,8 +143,7 @@ def style_for_occasion(occasion: str, wardrobe: dict) -> dict:
         result["status"] = "incompatible"
         result["warning"] = reason
         result["missing_garments"] = missing
-        result["duration_sec"] = round(time.monotonic() - start_time, 3)
-        return result
+        return _finalize(result, start_time, tokens_before, wardrobe_count)
 
     # 2. Prepare wardrobe inventory representation
     item_map = {it.get("id"): it for it in items if it.get("id")}
@@ -156,19 +188,16 @@ def style_for_occasion(occasion: str, wardrobe: dict) -> dict:
     except ModelUnavailable as exc:
         result["status"] = "error"
         result["warning"] = f"Model unavailable: {exc}"
-        result["duration_sec"] = round(time.monotonic() - start_time, 3)
-        return result
+        return _finalize(result, start_time, tokens_before, wardrobe_count)
 
     # 3. Parse JSON response
     try:
-        # Strip potential markdown fences if present
         clean_json = raw_response.strip()
         if clean_json.startswith("```"):
             clean_json = re.sub(r"^```(?:json)?\s*", "", clean_json)
             clean_json = re.sub(r"\s*```$", "", clean_json)
         parsed = json.loads(clean_json)
     except Exception:
-        # Fallback regex extraction if JSON had minor syntax glitch
         match = re.search(r"\{.*\}", raw_response, re.DOTALL)
         if match:
             try:
@@ -176,13 +205,11 @@ def style_for_occasion(occasion: str, wardrobe: dict) -> dict:
             except Exception as parse_err:
                 result["status"] = "error"
                 result["warning"] = f"Failed to parse model JSON: {parse_err}. Raw: {raw_response[:100]}"
-                result["duration_sec"] = round(time.monotonic() - start_time, 3)
-                return result
+                return _finalize(result, start_time, tokens_before, wardrobe_count)
         else:
             result["status"] = "error"
             result["warning"] = f"Model did not return valid JSON. Raw: {raw_response[:100]}"
-            result["duration_sec"] = round(time.monotonic() - start_time, 3)
-            return result
+            return _finalize(result, start_time, tokens_before, wardrobe_count)
 
     # 4. Check compatibility flag from model
     if not parsed.get("is_compatible", True):
@@ -190,14 +217,7 @@ def style_for_occasion(occasion: str, wardrobe: dict) -> dict:
         result["warning"] = parsed.get("explanation") or f"Wardrobe cannot support occasion '{cleaned_occ}'."
         result["missing_garments"] = parsed.get("missing_garments", [])
         result["explanation"] = parsed.get("explanation", "")
-        tokens_after = token_counts()
-        result["tokens_used"] = {
-            "prompt": tokens_after["prompt"] - tokens_before["prompt"],
-            "output": tokens_after["output"] - tokens_before["output"],
-            "total": tokens_after["total"] - tokens_before["total"],
-        }
-        result["duration_sec"] = round(time.monotonic() - start_time, 3)
-        return result
+        return _finalize(result, start_time, tokens_before, wardrobe_count)
 
     # 5. Validate selected items against wardrobe strictly (Zero Hallucination Guard)
     candidate_ids = parsed.get("selected_item_ids", [])
@@ -222,24 +242,4 @@ def style_for_occasion(occasion: str, wardrobe: dict) -> dict:
         result["status"] = "incompatible"
         result["warning"] = f"Model was unable to assemble a complete outfit (found {len(seen_categories)} categories)."
 
-    tokens_after = token_counts()
-    result["tokens_used"] = {
-        "prompt": tokens_after["prompt"] - tokens_before["prompt"],
-        "output": tokens_after["output"] - tokens_before["output"],
-        "total": tokens_after["total"] - tokens_before["total"],
-    }
-    result["duration_sec"] = round(time.monotonic() - start_time, 3)
-    return result
-
-
-if __name__ == "__main__":
-    from utils.data_loader import get_example_wardrobe
-    w = get_example_wardrobe()
-    print("Testing casual occasion:")
-    res = style_for_occasion("casual coffee date on a cool autumn afternoon", w)
-    print("Status:", res["status"])
-    print("Selected IDs:", res["selected_ids"])
-    print("Categories:", res["selected_categories"])
-    print("Explanation:", res["explanation"])
-    print("Duration:", res["duration_sec"], "s")
-    print("Tokens:", res["tokens_used"])
+    return _finalize(result, start_time, tokens_before, wardrobe_count)
