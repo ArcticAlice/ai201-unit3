@@ -91,7 +91,7 @@ def _finalize(result: dict, start_time: float, tokens_before: dict, wardrobe_cou
     return result
 
 
-def style_for_occasion(occasion: str, wardrobe: dict) -> dict:
+def style_for_occasion(occasion: str, wardrobe: dict, cache: bool = True) -> dict:
     """
     Given an occasion string and a wardrobe dict, return a recommended outfit
     composed strictly of items the user owns, or a structured refusal if incompatible.
@@ -184,7 +184,7 @@ def style_for_occasion(occasion: str, wardrobe: dict) -> dict:
     )
 
     try:
-        raw_response = generate(user_prompt, system=system_instruction, temperature=0.2)
+        raw_response = generate(user_prompt, system=system_instruction, temperature=0.2, cache=cache)
     except ModelUnavailable as exc:
         result["status"] = "error"
         result["warning"] = f"Model unavailable: {exc}"

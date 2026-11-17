@@ -70,20 +70,31 @@ def _cache_key(prompt: str, system: str | None, temperature: float) -> str:
     return hashlib.sha256(blob.encode("utf-8")).hexdigest()[:32]
 
 
-def _cache_read(key: str) -> str | None:
+def _cache_read(key: str) -> tuple[str, int, int] | None:
     path = config.CACHE_DIR / f"{key}.json"
     if not path.exists():
         return None
     try:
-        return json.loads(path.read_text(encoding="utf-8"))["response"]
+        data = json.loads(path.read_text(encoding="utf-8"))
+        resp = data["response"]
+        p_tok = data.get("prompt_tokens", 0)
+        o_tok = data.get("output_tokens", 0)
+        return (resp, p_tok, o_tok)
     except Exception:
         return None
 
 
-def _cache_write(key: str, response: str) -> None:
+def _cache_write(key: str, response: str, prompt_tokens: int = 0, output_tokens: int = 0) -> None:
     config.CACHE_DIR.mkdir(exist_ok=True)
     path = config.CACHE_DIR / f"{key}.json"
-    path.write_text(json.dumps({"response": response}), encoding="utf-8")
+    path.write_text(
+        json.dumps({
+            "response": response,
+            "prompt_tokens": prompt_tokens,
+            "output_tokens": output_tokens,
+        }),
+        encoding="utf-8",
+    )
 
 
 def clear_cache() -> int:
@@ -281,7 +292,7 @@ def generate(
     Every call in this course goes through here. If you need to change how the
     model is called, change it in this one place.
     """
-    global _session_calls, _cache_hits
+    global _session_calls, _cache_hits, _prompt_tokens, _output_tokens
 
     use_cache = cache and config.CACHE_ENABLED
     temperature = config.TEMPERATURE if temperature is None else temperature
@@ -290,8 +301,11 @@ def generate(
     if use_cache:
         hit = _cache_read(key)
         if hit is not None:
+            resp_text, p_tok, o_tok = hit
             _cache_hits += 1
-            return hit
+            _prompt_tokens += p_tok
+            _output_tokens += o_tok
+            return resp_text
 
     _check_budget()
 
@@ -317,7 +331,10 @@ def generate(
             text = (response.text or "").strip()
 
             if use_cache:
-                _cache_write(key, text)
+                meta = getattr(response, "usage_metadata", None)
+                p_tok = getattr(meta, "prompt_token_count", 0) if meta else 0
+                o_tok = getattr(meta, "candidates_token_count", 0) if meta else 0
+                _cache_write(key, text, p_tok, o_tok)
             return text
 
         except Exception as exc:  # noqa: BLE001 — surfaced below

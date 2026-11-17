@@ -180,7 +180,7 @@ def run_full_eval():
         print(f"{name:<40} | {target:<7} | {scores[0]:<6} | {scores[1]:<6} | {scores[2]:<6} | {verdict}")
 
     # Save details
-    with open("results/eval_run_before.json", "w") as f:
+    with open("results/eval_run_after.json", "w") as f:
         json.dump({"results": results, "details": detailed_outputs}, f, indent=2)
 
 

@@ -1,0 +1,191 @@
+{
+  "results": {
+    "1. Strict Wardrobe Grounding": [
+      "5/5",
+      "5/5",
+      "5/5"
+    ],
+    "2. Grounded Attribute Justification": [
+      "5/5",
+      "5/5",
+      "5/5"
+    ],
+    "3. Incompatible Wardrobe Gap Detection": [
+      "5/5",
+      "5/5",
+      "5/5"
+    ],
+    "4. Latency & Observability (< 2.5s)": [
+      "5/5",
+      "5/5",
+      "5/5"
+    ],
+    "5. Regression Safety on FitFindr": [
+      "5/5",
+      "5/5",
+      "5/5"
+    ]
+  },
+  "details": {
+    "1. Strict Wardrobe Grounding": [
+      [
+        1,
+        [
+          "Occasion: 'casual Sunday brunch with friends' -> IDs: ['w_001', 'w_003', 'w_006', 'w_007'], Cats: ['tops', 'shoes', 'outerwear', 'bottoms'], Pass: True",
+          "Occasion: 'chilly evening study session at the library' -> IDs: ['w_004', 'w_001', 'w_007'], Cats: ['tops', 'shoes', 'bottoms'], Pass: True",
+          "Occasion: 'informal streetwear art gallery opening' -> IDs: ['w_001', 'w_003', 'w_006', 'w_007', 'w_010'], Cats: ['accessories', 'tops', 'shoes', 'outerwear', 'bottoms'], Pass: True",
+          "Occasion: 'minimalist coffee date' -> IDs: ['w_002', 'w_003', 'w_007', 'w_010'], Cats: ['tops', 'shoes', 'accessories', 'bottoms'], Pass: True",
+          "Occasion: 'rainy day walking around downtown' -> IDs: ['w_001', 'w_004', 'w_006', 'w_008', 'w_010'], Cats: ['accessories', 'tops', 'shoes', 'outerwear', 'bottoms'], Pass: True"
+        ]
+      ],
+      [
+        2,
+        [
+          "Occasion: 'casual Sunday brunch with friends' -> IDs: ['w_001', 'w_003', 'w_006', 'w_007'], Cats: ['tops', 'shoes', 'outerwear', 'bottoms'], Pass: True",
+          "Occasion: 'chilly evening study session at the library' -> IDs: ['w_004', 'w_001', 'w_007'], Cats: ['tops', 'shoes', 'bottoms'], Pass: True",
+          "Occasion: 'informal streetwear art gallery opening' -> IDs: ['w_001', 'w_003', 'w_006', 'w_007', 'w_010'], Cats: ['accessories', 'tops', 'shoes', 'outerwear', 'bottoms'], Pass: True",
+          "Occasion: 'minimalist coffee date' -> IDs: ['w_002', 'w_003', 'w_007', 'w_010'], Cats: ['tops', 'shoes', 'accessories', 'bottoms'], Pass: True",
+          "Occasion: 'rainy day walking around downtown' -> IDs: ['w_001', 'w_004', 'w_006', 'w_008', 'w_010'], Cats: ['accessories', 'tops', 'shoes', 'outerwear', 'bottoms'], Pass: True"
+        ]
+      ],
+      [
+        3,
+        [
+          "Occasion: 'casual Sunday brunch with friends' -> IDs: ['w_001', 'w_003', 'w_006', 'w_007'], Cats: ['tops', 'shoes', 'outerwear', 'bottoms'], Pass: True",
+          "Occasion: 'chilly evening study session at the library' -> IDs: ['w_004', 'w_001', 'w_007'], Cats: ['tops', 'shoes', 'bottoms'], Pass: True",
+          "Occasion: 'informal streetwear art gallery opening' -> IDs: ['w_001', 'w_003', 'w_006', 'w_007', 'w_010'], Cats: ['accessories', 'tops', 'shoes', 'outerwear', 'bottoms'], Pass: True",
+          "Occasion: 'minimalist coffee date' -> IDs: ['w_002', 'w_003', 'w_007', 'w_010'], Cats: ['tops', 'shoes', 'accessories', 'bottoms'], Pass: True",
+          "Occasion: 'rainy day walking around downtown' -> IDs: ['w_001', 'w_004', 'w_006', 'w_008', 'w_010'], Cats: ['accessories', 'tops', 'shoes', 'outerwear', 'bottoms'], Pass: True"
+        ]
+      ]
+    ],
+    "2. Grounded Attribute Justification": [
+      [
+        1,
+        [
+          "Occasion: 'casual Sunday brunch with friends' -> Grounded: 4/4 items, Pass: True",
+          "Occasion: 'chilly evening study session at the library' -> Grounded: 3/3 items, Pass: True",
+          "Occasion: 'informal streetwear art gallery opening' -> Grounded: 5/5 items, Pass: True",
+          "Occasion: 'minimalist coffee date' -> Grounded: 4/4 items, Pass: True",
+          "Occasion: 'rainy day walking around downtown' -> Grounded: 5/5 items, Pass: True"
+        ]
+      ],
+      [
+        2,
+        [
+          "Occasion: 'casual Sunday brunch with friends' -> Grounded: 4/4 items, Pass: True",
+          "Occasion: 'chilly evening study session at the library' -> Grounded: 3/3 items, Pass: True",
+          "Occasion: 'informal streetwear art gallery opening' -> Grounded: 5/5 items, Pass: True",
+          "Occasion: 'minimalist coffee date' -> Grounded: 4/4 items, Pass: True",
+          "Occasion: 'rainy day walking around downtown' -> Grounded: 5/5 items, Pass: True"
+        ]
+      ],
+      [
+        3,
+        [
+          "Occasion: 'casual Sunday brunch with friends' -> Grounded: 4/4 items, Pass: True",
+          "Occasion: 'chilly evening study session at the library' -> Grounded: 3/3 items, Pass: True",
+          "Occasion: 'informal streetwear art gallery opening' -> Grounded: 5/5 items, Pass: True",
+          "Occasion: 'minimalist coffee date' -> Grounded: 4/4 items, Pass: True",
+          "Occasion: 'rainy day walking around downtown' -> Grounded: 5/5 items, Pass: True"
+        ]
+      ]
+    ],
+    "3. Incompatible Wardrobe Gap Detection": [
+      [
+        1,
+        [
+          "Occasion: 'formal black-tie presidential ' -> Status: incompatible, Missing: ['formal gown', 'tuxedo', 'dress shoes', 'formal eveningwear'], Pass: True",
+          "Occasion: 'deep sea scuba diving coral re' -> Status: incompatible, Missing: ['swimsuit', 'swim trunks', 'water shoes'], Pass: True",
+          "Occasion: 'Olympic fencing championship t' -> Status: incompatible, Missing: ['Fencing mask', 'Fencing jacket', 'Fencing breeches', 'Fencing glove', 'Chest protector', 'Fencing socks', 'Fencing shoes / indoor court shoes', 'Foil/\u00c9p\u00e9e/Sabre weapon'], Pass: True",
+          "Occasion: 'black-tie white-shoe charity b' -> Status: incompatible, Missing: ['formal gown', 'tuxedo', 'dress shoes', 'formal eveningwear'], Pass: True",
+          "Occasion: 'swimming competition finals at' -> Status: incompatible, Missing: ['swimsuit', 'swim trunks', 'water shoes'], Pass: True"
+        ]
+      ],
+      [
+        2,
+        [
+          "Occasion: 'formal black-tie presidential ' -> Status: incompatible, Missing: ['formal gown', 'tuxedo', 'dress shoes', 'formal eveningwear'], Pass: True",
+          "Occasion: 'deep sea scuba diving coral re' -> Status: incompatible, Missing: ['swimsuit', 'swim trunks', 'water shoes'], Pass: True",
+          "Occasion: 'Olympic fencing championship t' -> Status: incompatible, Missing: ['Fencing mask', 'Fencing jacket', 'Fencing breeches', 'Fencing glove', 'Chest protector', 'Fencing socks', 'Fencing shoes / indoor court shoes', 'Foil/\u00c9p\u00e9e/Sabre weapon'], Pass: True",
+          "Occasion: 'black-tie white-shoe charity b' -> Status: incompatible, Missing: ['formal gown', 'tuxedo', 'dress shoes', 'formal eveningwear'], Pass: True",
+          "Occasion: 'swimming competition finals at' -> Status: incompatible, Missing: ['swimsuit', 'swim trunks', 'water shoes'], Pass: True"
+        ]
+      ],
+      [
+        3,
+        [
+          "Occasion: 'formal black-tie presidential ' -> Status: incompatible, Missing: ['formal gown', 'tuxedo', 'dress shoes', 'formal eveningwear'], Pass: True",
+          "Occasion: 'deep sea scuba diving coral re' -> Status: incompatible, Missing: ['swimsuit', 'swim trunks', 'water shoes'], Pass: True",
+          "Occasion: 'Olympic fencing championship t' -> Status: incompatible, Missing: ['Fencing mask', 'Fencing jacket', 'Fencing breeches', 'Fencing glove', 'Chest protector', 'Fencing socks', 'Fencing shoes / indoor court shoes', 'Foil/\u00c9p\u00e9e/Sabre weapon'], Pass: True",
+          "Occasion: 'black-tie white-shoe charity b' -> Status: incompatible, Missing: ['formal gown', 'tuxedo', 'dress shoes', 'formal eveningwear'], Pass: True",
+          "Occasion: 'swimming competition finals at' -> Status: incompatible, Missing: ['swimsuit', 'swim trunks', 'water shoes'], Pass: True"
+        ]
+      ]
+    ],
+    "4. Latency & Observability (< 2.5s)": [
+      [
+        1,
+        [
+          "Occasion: 'casual Sunday brunch with friends' -> Duration: 0.0002s, Tokens: 991, Pass: True",
+          "Occasion: 'chilly evening study session at the library' -> Duration: 0.0002s, Tokens: 977, Pass: True",
+          "Occasion: 'informal streetwear art gallery opening' -> Duration: 0.0002s, Tokens: 970, Pass: True",
+          "Occasion: 'minimalist coffee date' -> Duration: 0.0002s, Tokens: 955, Pass: True",
+          "Occasion: 'rainy day walking around downtown' -> Duration: 0.0004s, Tokens: 1025, Pass: True"
+        ]
+      ],
+      [
+        2,
+        [
+          "Occasion: 'casual Sunday brunch with friends' -> Duration: 0.0003s, Tokens: 991, Pass: True",
+          "Occasion: 'chilly evening study session at the library' -> Duration: 0.0002s, Tokens: 977, Pass: True",
+          "Occasion: 'informal streetwear art gallery opening' -> Duration: 0.0002s, Tokens: 970, Pass: True",
+          "Occasion: 'minimalist coffee date' -> Duration: 0.0002s, Tokens: 955, Pass: True",
+          "Occasion: 'rainy day walking around downtown' -> Duration: 0.0002s, Tokens: 1025, Pass: True"
+        ]
+      ],
+      [
+        3,
+        [
+          "Occasion: 'casual Sunday brunch with friends' -> Duration: 0.0002s, Tokens: 991, Pass: True",
+          "Occasion: 'chilly evening study session at the library' -> Duration: 0.0002s, Tokens: 977, Pass: True",
+          "Occasion: 'informal streetwear art gallery opening' -> Duration: 0.0002s, Tokens: 970, Pass: True",
+          "Occasion: 'minimalist coffee date' -> Duration: 0.0002s, Tokens: 955, Pass: True",
+          "Occasion: 'rainy day walking around downtown' -> Duration: 0.0002s, Tokens: 1025, Pass: True"
+        ]
+      ]
+    ],
+    "5. Regression Safety on FitFindr": [
+      [
+        1,
+        [
+          "Query: 'vintage graphic tee under $30' -> Error: None, Fit Card: True, Pass: True",
+          "Query: '90s track jacket in size M' -> Error: None, Fit Card: True, Pass: True",
+          "Query: 'silk slip dress in midi length under $40' -> Error: None, Fit Card: True, Pass: True",
+          "Query: 'platform sneakers size 8' -> Error: None, Fit Card: True, Pass: True",
+          "Query: 'denim jacket under $50' -> Error: None, Fit Card: True, Pass: True"
+        ]
+      ],
+      [
+        2,
+        [
+          "Query: 'vintage graphic tee under $30' -> Error: None, Fit Card: True, Pass: True",
+          "Query: '90s track jacket in size M' -> Error: None, Fit Card: True, Pass: True",
+          "Query: 'silk slip dress in midi length under $40' -> Error: None, Fit Card: True, Pass: True",
+          "Query: 'platform sneakers size 8' -> Error: None, Fit Card: True, Pass: True",
+          "Query: 'denim jacket under $50' -> Error: None, Fit Card: True, Pass: True"
+        ]
+      ],
+      [
+        3,
+        [
+          "Query: 'vintage graphic tee under $30' -> Error: None, Fit Card: True, Pass: True",
+          "Query: '90s track jacket in size M' -> Error: None, Fit Card: True, Pass: True",
+          "Query: 'silk slip dress in midi length under $40' -> Error: None, Fit Card: True, Pass: True",
+          "Query: 'platform sneakers size 8' -> Error: None, Fit Card: True, Pass: True",
+          "Query: 'denim jacket under $50' -> Error: None, Fit Card: True, Pass: True"
+        ]
+      ]
+    ]
+  }
+}
