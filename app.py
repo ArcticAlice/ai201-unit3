@@ -161,6 +161,45 @@ def cmd_ask(args):
         print(generate.usage())
 
 
+def cmd_occasion(args):
+    """Capstone — style an outfit from the user's wardrobe for a specific occasion."""
+    from utils.data_loader import get_example_wardrobe, get_empty_wardrobe
+    from occasion_stylist import style_for_occasion
+    import generate
+
+    wardrobe = get_empty_wardrobe() if args.empty_wardrobe else get_example_wardrobe()
+    if args.empty_wardrobe:
+        print("(running with an empty wardrobe)\n")
+
+    occasion = args.occasion
+    if not occasion:
+        try:
+            occasion = input("Enter an occasion (e.g. 'casual brunch', 'tech interview'): ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print()
+            return
+
+    try:
+        print(f"Occasion: {occasion}\n")
+        res = style_for_occasion(occasion, wardrobe)
+        if res["status"] == "incompatible":
+            print(f"⚠️  Incompatible Wardrobe: {res['warning']}")
+            if res.get("missing_garments"):
+                print("\nMissing items needed for this dress code:")
+                for item in res["missing_garments"]:
+                    print(f"  • {item}")
+        elif res["status"] == "error":
+            print(f"❌ Error: {res.get('warning', 'An error occurred during styling')}")
+        else:
+            print("👔 Recommended Outfit:")
+            for item in res["selected_items"]:
+                print(f"  • [{item.get('id')}] {item.get('name')} ({item.get('category')})")
+            print(f"\n💡 Styling Rationale:\n{res['explanation']}")
+            print(f"\n⏱️ Latency: {res['duration_sec']:.2f}s | Tokens: {res['tokens_used']['total']}")
+    finally:
+        print("\n" + generate.usage())
+
+
 def build_parser():
     parser = argparse.ArgumentParser(
         prog="app.py",
@@ -190,6 +229,15 @@ def build_parser():
         help="run as a user with nothing saved — one of unit 4's failure modes",
     )
     p_ask.set_defaults(func=cmd_ask)
+
+    p_occ = sub.add_parser("occasion", help="style an outfit for an occasion using your wardrobe")
+    p_occ.add_argument("occasion", nargs="?", help="occasion description (e.g. 'casual coffee date', 'black-tie gala')")
+    p_occ.add_argument(
+        "--empty-wardrobe",
+        action="store_true",
+        help="run as a user with nothing saved",
+    )
+    p_occ.set_defaults(func=cmd_occasion)
 
     return parser
 
